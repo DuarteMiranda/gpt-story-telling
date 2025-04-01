@@ -6,29 +6,24 @@ from agents.agent_rolepay import roleplay_agent
 from agents.agent_narrative_force import narrative_forcing_agent
 
 
-from agents.personalities import EVELYNE_PERSONALITY
-from agents.personalities import ELEANOR_PERSONALITY
-from agents.personalities import KIANA_PERSONALITY
-
+from agents.personalities import Character
+from agents.personalities import CHARACTERS
 from functions.load_tags import load_lore_entries
 from functions.score_lore_entries import score_lore_entries
 
-INCLUDE_AGENT_REASONING = False
+INCLUDE_AGENT_REASONING = True
 
 lore_data, tag_list = load_lore_entries()
 
-agent_name = "Eleanor"
-agent_name_2 = "Kiana"
-personality = ELEANOR_PERSONALITY
+CHARACTER = CHARACTERS["daughters"]
+agent_name = CHARACTER.name
+personality = CHARACTER.personality
+start_prompt= CHARACTER.starting_prompt
+
 chat_history = []
 
-START_PROMPT="""You arrive home late at night. As you turn on the light, you're startled to see a pale woman with red eyes smirking in your living room. She slowly walks towards you.
-As she passes by a small table, her hand casually brushes against a vase, sending it crashing to the floor. She shrugs her shoulders nonchalantly, bringing her hand up to cover her mouth. Oops. she says in a mock-innocent voice.
-Before you can even react, Eleanor moves with blinding speed, pinning you against the wall in the blink of an eye. Her body presses firmly against yours, her strength evident in every muscle.
-Leaning in close, she inhales deeply, taking in your scent. She exhales softly and whispers Mmm... you smell better than they usually do."""
-
 chat_history.append({
-        "agent": START_PROMPT.strip()
+        "agent": start_prompt.strip()
     })
 
 narrative_history= []
@@ -37,7 +32,7 @@ retrieve_memory = False
 
 os.system('cls' if os.name == 'nt' else 'clear')
 
-print(f"🩸"+START_PROMPT+"\n")
+print(f"🩸"+start_prompt+"\n")
 
 i=0
 added_context=""
@@ -82,24 +77,20 @@ while True:
 
         narrative_history.clear()
 
-    if(i%2==0):
-        added_action="Add a character action that moves the story forward, after your dialogue"
-        print("\t⚙️  Forcing action")
-
     # Call the agent
     agent_response = roleplay_agent(
         user_input=user_input,
         personality=personality,
         chat_history=chat_history,
         agent_name=agent_name,
-        added_context=added_context,
-        added_action=added_action
+        added_context=added_context
     )
 
     # Print the agent's reply
-    print(f"\n🩸 {agent_name}: {agent_response.agent_reply}\n")
+    print(f"\n🩸 {agent_name}\n {agent_response.agent_reply}\n")
     if(INCLUDE_AGENT_REASONING):
-        print(f"🧠 (Reasoning) {agent_name}: {agent_response.reasoning}\n")
+        print(f"🧠 (Reasoning) {agent_response.reasoning}\n")
+        print(f"🧠 (Goal) {agent_response.agent_goal}\n")
 
     # Update conversation history
     chat_history.append({
