@@ -1,0 +1,4 @@
+component 0,timestamp
+"[{""role"": ""user"", ""metadata"": null, ""content"": ""Hello"", ""options"": null}, {""role"": ""assistant"", ""metadata"": null, ""content"": ""Ask me anything!"", ""options"": null}]",2025-04-02 18:06:04.057047
+"[{""role"": ""user"", ""metadata"": null, ""content"": ""Am I cool?"", ""options"": null}, {""role"": ""assistant"", ""metadata"": null, ""content"": ""Yes"", ""options"": null}]",2025-04-02 18:06:04.064176
+"[{""role"": ""user"", ""metadata"": null, ""content"": ""Are tomatoes vegetables?"", ""options"": null}, {""role"": ""assistant"", ""metadata"": null, ""content"": ""Yes"", ""options"": null}]",2025-04-02 18:06:04.069143

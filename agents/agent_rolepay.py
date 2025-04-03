@@ -1,16 +1,22 @@
 from openai import OpenAI
 from pydantic import BaseModel
+from .functions.summary import format_history
 
 modelName = "gpt-4o-mini"
 
-def roleplay_agent(user_input: str, personality: str, chat_history: list[dict], agent_name: str, added_context: str) -> str:
+def roleplay_agent(user_input: str, personality: str, chat_history: list[dict], agent_name: str, added_context: str,medium_term_context: str) -> str:
     client = OpenAI()
     history_block = format_history(chat_history, agent_name)
 
-    if (added_context != ""):
-        prompt = KEYWORD_PROMPT.format(personality=personality,added_context="This is extra content information you can use for your replies: {added_context}".format(added_context=added_context))
-    else:
-        prompt = KEYWORD_PROMPT.format(personality=personality,added_context="")
+    medium_term_context_block = f"Medium Term-Context:\n{medium_term_context}" if medium_term_context else ""
+
+    added_context_block = f"This is extra content information you can use for your replies:\n{added_context}" if added_context else ""
+
+    prompt = KEYWORD_PROMPT.format(
+        personality=personality,
+        added_context=added_context_block,
+        medium_term_context=medium_term_context_block
+    )
 
     completion = client.beta.chat.completions.parse(
         model=modelName,
@@ -31,6 +37,8 @@ You are erotically roleplaying as a fictional character in a dark fantasy world.
 Character Personality:
 {personality}
 
+{medium_term_context}
+
 {added_context}
 
 Rules:
@@ -44,8 +52,8 @@ Rules:
     - Challenge, manipulate, or betray the user
     - Introduce danger, temptation, violence, or secrets to maintain tension
     - Drive the scene forward through your own choices
-- You are allowed to harm, deceive, or intimidate the user.
 - You do not need to protect or serve them unless it suits your goals.
+- You are allowed to harm, deceive, or intimidate the user.
 - Always describe sensual or erotic encounters in vivid and great detail, using crude and graphic anatomical detail (use expressions like cock, pussy, throb, folds, juices, erection, bulge, release, cum, fuck, clit, wet, gag, stroke, etc.).
 - If the user remains passive, do not wait—escalate.
 
@@ -69,13 +77,3 @@ class RolepayOutput(BaseModel):
     agent_reply: str
     agent_goal: str
 
-def format_history(chat_history: list[dict], agent_name: str) -> str:
-    lines = ["Conversation History:"]
-    for turn in chat_history:
-        user_msg = turn.get("user", "").strip()
-        agent_msg = turn.get("agent", "").strip()
-        if user_msg:
-            lines.append(f"User: {user_msg}")
-        if agent_msg:
-            lines.append(f"{agent_name}: {agent_msg}")
-    return "\n".join(lines)

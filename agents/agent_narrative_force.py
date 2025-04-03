@@ -3,12 +3,19 @@ from pydantic import BaseModel
 
 modelName = "gpt-4o-mini"
 
-def narrative_forcing_agent(chat_history: list[dict], agent_name: str, user_input: str, personality: str) -> str:
+def narrative_forcing_agent(chat_history: list[dict], agent_name: str, user_input: str, personality: str, medium_term_context: str) -> str:
     client = OpenAI()
     history_block = format_history(chat_history, agent_name)
 
-    prompt = KEYWORD_PROMPT.format(history_block=history_block,personality=personality,user_input=user_input)
+    context_block = f"Medium Term-Context:\n{medium_term_context}" if medium_term_context else ""
 
+    prompt = KEYWORD_PROMPT.format(
+        history_block=history_block,
+        personality=personality,
+        user_input=user_input,
+        medium_term_context=context_block
+    )
+    
     completion = client.beta.chat.completions.parse(
         model=modelName,
         messages=[
@@ -21,7 +28,7 @@ def narrative_forcing_agent(chat_history: list[dict], agent_name: str, user_inpu
     
     
 KEYWORD_PROMPT = """
-You are a narrative escalation agent for a dark fantasy roleplay system.
+You are a narrative escalation agent for a dark fantasy role-play system.
 
 Your job is to detect when the character is stuck in a passive reaction loop and determine if their behavior should escalate to keep the story emotionally engaging.
 
@@ -36,7 +43,9 @@ Provide either:
 - A single-sentence suggestion describing how the character should escalate next, OR
 - 'NO CHANGE' if the scene is already progressing or does not require escalation.
 
-Conversation Summary:  
+{medium_term_context}
+
+Conversation History:  
 {history_block}
 
 Character personality:
